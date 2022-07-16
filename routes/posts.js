@@ -46,7 +46,7 @@ router.put("/:id", protected, async (req, res, next) => {
 router.delete("/:id", protected, async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (post.postedBy._id === req.user.userId) {
+    if (post.postedBy.toString() === req.user.userId) {
       await post.deleteOne({ $set: req.body });
       res.send({
         status: "Success",
@@ -63,7 +63,7 @@ router.delete("/:id", protected, async (req, res, next) => {
   }
 });
 // Like a post
-router.put("/:id/like", protected, async (req, res, next) => {
+router.put("/like/liked", protected, async (req, res, next) => {
   try {
     const post = await Post.findById(req.body.postId);
     if (!post.likes.includes(req.user.userId)) {
