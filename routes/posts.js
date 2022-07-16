@@ -25,7 +25,8 @@ router.post("/", protected, async (req, res, next) => {
 router.put("/:id", protected, async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (post.userId === req.body.userId) {
+    // const string = post.postedBy.toString();
+    if (post.postedBy.toString() === req.user.userId) {
       await post.updateOne({ $set: req.body });
       res.send({
         status: "Success",
@@ -45,7 +46,7 @@ router.put("/:id", protected, async (req, res, next) => {
 router.delete("/:id", protected, async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (post.userId === req.body.userId) {
+    if (post.postedBy._id === req.user.userId) {
       await post.deleteOne({ $set: req.body });
       res.send({
         status: "Success",
@@ -64,15 +65,15 @@ router.delete("/:id", protected, async (req, res, next) => {
 // Like a post
 router.put("/:id/like", protected, async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.id);
-    if (!post.likes.includes(req.body.userId)) {
-      await post.updateOne({ $push: { likes: req.body.userId } });
+    const post = await Post.findById(req.body.postId);
+    if (!post.likes.includes(req.user.userId)) {
+      await post.updateOne({ $push: { likes: req.user.userId } });
       res.send({
         status: "Success",
         message: "The post has been liked",
       });
     } else {
-      await post.updateOne({ $pull: { likes: req.body.userId } });
+      await post.updateOne({ $pull: { likes: req.user.userId } });
       res.send({
         status: "Success",
         message: "The post has been disliked",
@@ -113,7 +114,7 @@ router.get("/timeline/all", async (req, res, next) => {
 // get liked post
 router.get("/timeline/liked", protected, async (req, res, next) => {
   try {
-    const post = await Post.find({ likes: { $in: req.body.userId } }).sort({
+    const post = await Post.find({ likes: { $in: req.user.userId } }).sort({
       createdAt: -1,
     });
 
