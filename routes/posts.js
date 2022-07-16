@@ -127,5 +127,18 @@ router.get("/timeline/liked", protected, async (req, res, next) => {
     next(error);
   }
 });
+// get my post
+router.get("/timeline/profile", protected, async (req, res, next) => {
+  try {
+    const post = await Post.find({ postedBy: req.user.userId }).sort({
+      createdAt: -1,
+    });
+    res.send({
+      status: "Success",
+      message: "Success get a post",
+      data: post,
+    });
+  } catch (error) {}
+});
 
 module.exports = router;
