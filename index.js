@@ -2,13 +2,16 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const helmet = require("helmet");
-const morgan = require("morgan");
+const cors = require("cors");
+const bearerToken = require("express-bearer-token");
+
+// import Router
 const userRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
+const postRouter = require("./routes/posts");
 
+// Connecting to mongoDB
 dotenv.config();
-
 mongoose.connect(process.env.MONGO_URL).then(
   () => {
     console.log("Connected to mongoDB");
@@ -19,12 +22,15 @@ mongoose.connect(process.env.MONGO_URL).then(
 );
 
 // midleware
+app.use(cors());
+app.use(bearerToken());
+app.use("/public", express.static("public"));
 app.use(express.json());
-app.use(helmet());
-app.use(morgan("common"));
 
+// Routes
 app.use("/users", userRouter);
 app.use("/auth", authRouter);
+app.use("/posts", postRouter);
 
 // error handler
 app.use((error, req, res, next) => {

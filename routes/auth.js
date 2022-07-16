@@ -3,6 +3,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const { isFieldEmpties, checkPasswordValidity } = require("../helper");
 const validator = require("email-validator");
+const { createToken } = require("../lib/token");
 
 // Register
 router.post("/register", async (req, res, next) => {
@@ -63,7 +64,7 @@ router.post("/register", async (req, res, next) => {
 
     // save user and response
     const user = await newUser.save();
-    res.status(200).send({
+    res.send({
       status: "success",
       message: "Success create new user",
       detail: {
@@ -98,9 +99,21 @@ router.post("/login", async (req, res, next) => {
       throw error;
     }
 
-    res.status(200).send({
-      status: "success",
+    const token = createToken({
+      userId: user._id,
+      username: user.username,
+    });
+
+    res.send({
+      status: "Success",
       message: "Login Success",
+      data: {
+        result: {
+          userId: user._id,
+          username: user.username,
+          accessToken: token,
+        },
+      },
     });
   } catch (error) {
     next(error);
