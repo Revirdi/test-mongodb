@@ -74,7 +74,7 @@ router.put("/:id", protected, async (req, res, next) => {
 // get a user
 router.get("/:id", protected, async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.userId);
+    const user = await User.findById(req.params.id);
     const { password, updatedAt, ...other } = user._doc;
     res.send({
       status: "Success",

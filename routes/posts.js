@@ -21,27 +21,6 @@ router.post("/", protected, async (req, res, next) => {
     next(error);
   }
 });
-// Update a post
-router.put("/:id", protected, async (req, res, next) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    // const string = post.postedBy.toString();
-    if (post.postedBy.toString() === req.user.userId) {
-      await post.updateOne({ $set: req.body });
-      res.send({
-        status: "Success",
-        message: "Succes update a post",
-      });
-    } else {
-      throw {
-        code: 401,
-        message: "Unauthorized",
-      };
-    }
-  } catch (error) {
-    next(error);
-  }
-});
 // delete a post
 router.delete("/:id", protected, async (req, res, next) => {
   try {
@@ -62,8 +41,29 @@ router.delete("/:id", protected, async (req, res, next) => {
     next(error);
   }
 });
+// Update a post
+router.put("/update/:id", protected, async (req, res, next) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    // const string = post.postedBy.toString();
+    if (post.postedBy.toString() === req.user.userId) {
+      await post.updateOne({ $set: req.body });
+      res.send({
+        status: "Success",
+        message: "Succes update a post",
+      });
+    } else {
+      throw {
+        code: 401,
+        message: "Unauthorized",
+      };
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 // Like a post
-router.put("/like/liked", protected, async (req, res, next) => {
+router.put("/like", protected, async (req, res, next) => {
   try {
     const post = await Post.findById(req.body.postId);
     if (!post.likes.includes(req.user.userId)) {
@@ -79,6 +79,34 @@ router.put("/like/liked", protected, async (req, res, next) => {
         message: "The post has been disliked",
       });
     }
+  } catch (error) {
+    next(error);
+  }
+});
+// Comment a post
+router.put("/comment", protected, async (req, res, next) => {
+  try {
+    const comment = {
+      text: req.body.text,
+      postedBy: req.user.userId,
+    };
+    await Post.findByIdAndUpdate(
+      req.body.postId,
+      {
+        $push: { comments: comment },
+      },
+      {
+        new: true,
+      }
+    )
+      .populate("comments.postedBy", "_id username")
+      .exec((err, result) => {
+        if (err) {
+          return res.status(422).json({ errpr: err });
+        } else {
+          res.json(result);
+        }
+      });
   } catch (error) {
     next(error);
   }
