@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const { isFieldEmpties, checkPasswordValidity } = require("../helper");
 const validator = require("email-validator");
 const { createToken } = require("../lib/token");
+const { sendMail } = require("../lib/nodemailer");
 
 // Register
 router.post("/register", async (req, res, next) => {
@@ -64,6 +65,8 @@ router.post("/register", async (req, res, next) => {
 
     // save user and response
     const user = await newUser.save();
+    const token = createToken({ userId: user._id });
+    await sendMail({ email, token });
     res.send({
       status: "success",
       message: "Success create new user",

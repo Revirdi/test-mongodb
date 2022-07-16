@@ -4,7 +4,22 @@ const bcrypt = require("bcryptjs");
 const { protected } = require("../helper/protected");
 const { checkPasswordValidity } = require("../helper");
 const validator = require("email-validator");
+const { verifyToken } = require("../lib/token.js");
 
+// verify user
+router.get("/verification/:token", async (req, res, next) => {
+  try {
+    const { token } = req.params;
+
+    const verifiedToken = verifyToken(token);
+
+    const checkUser = await User.findByIdAndUpdate(verifiedToken.userId, {
+      isVerified: true,
+    });
+
+    res.send("<h1>Verification success</h1>");
+  } catch (error) {}
+});
 // update user
 router.put("/:id", protected, async (req, res, next) => {
   if (req.user.userId === req.params.id) {
