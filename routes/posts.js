@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const Post = require("../models/Post");
+const Comment = require("../models/Comment");
 const { protected } = require("../helper/protected");
+const User = require("../models/User");
 // Create a post
 router.post("/", protected, async (req, res, next) => {
   const { desc, postImage } = req.body;
@@ -83,38 +85,16 @@ router.put("/like", protected, async (req, res, next) => {
     next(error);
   }
 });
-// Comment a post
-router.put("/comment", protected, async (req, res, next) => {
-  try {
-    const comment = {
-      text: req.body.text,
-      postedBy: req.user.userId,
-    };
-    await Post.findByIdAndUpdate(
-      req.body.postId,
-      {
-        $push: { comments: comment },
-      },
-      {
-        new: true,
-      }
-    )
-      .populate("comments.postedBy", "_id username")
-      .exec((err, result) => {
-        if (err) {
-          return res.status(422).json({ errpr: err });
-        } else {
-          res.json(result);
-        }
-      });
-  } catch (error) {
-    next(error);
-  }
-});
+
 // get a post
 router.get("/:id", protected, async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.find({ _id: req.params.id })
+      .populate({
+        path: "comments",
+        options: { limit: 1, sort: { createdAt: -1 } },
+      })
+      .populate("postedBy", "_id username profilePicture");
     res.send({
       status: "Success",
       message: "Success get a post",
@@ -128,7 +108,7 @@ router.get("/:id", protected, async (req, res, next) => {
 router.get("/timeline/all", async (req, res, next) => {
   try {
     const post = await Post.find()
-      .populate("postedBy", "_id username")
+      .populate("postedBy", "_id username profilePicture")
       .sort({ createdAt: -1 });
     res.send({
       status: "Success",
@@ -142,9 +122,11 @@ router.get("/timeline/all", async (req, res, next) => {
 // get liked post
 router.get("/timeline/liked", protected, async (req, res, next) => {
   try {
-    const post = await Post.find({ likes: { $in: req.user.userId } }).sort({
-      createdAt: -1,
-    });
+    const post = await Post.find({ likes: { $in: req.user.userId } })
+      .sort({
+        createdAt: -1,
+      })
+      .populate("postedBy", "_id username profilePicture");
 
     res.send({
       status: "Success",
@@ -158,9 +140,11 @@ router.get("/timeline/liked", protected, async (req, res, next) => {
 // get my post
 router.get("/timeline/profile", protected, async (req, res, next) => {
   try {
-    const post = await Post.find({ postedBy: req.user.userId }).sort({
-      createdAt: -1,
-    });
+    const post = await Post.find({ postedBy: req.user.userId })
+      .sort({
+        createdAt: -1,
+      })
+      .populate("postedBy", "_id username profilePicture");
     res.send({
       status: "Success",
       message: "Success get a post",

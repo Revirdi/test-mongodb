@@ -9,6 +9,7 @@ const bearerToken = require("express-bearer-token");
 const userRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const postRouter = require("./routes/posts");
+const commentRouter = require("./routes/comments");
 
 // Connecting to mongoDB
 dotenv.config();
@@ -31,6 +32,7 @@ app.use(express.json());
 app.use("/users", userRouter);
 app.use("/auth", authRouter);
 app.use("/posts", postRouter);
+app.use("/comments", commentRouter);
 
 // error handler
 app.use((error, req, res, next) => {

@@ -63,10 +63,16 @@ router.post("/register", async (req, res, next) => {
       password: hashedPassword,
     });
 
-    // save user and response
+    // save user to mongo
     const user = await newUser.save();
+
+    // create token
     const token = createToken({ userId: user._id });
+
+    // create email
     await sendMail({ email, token });
+
+    // response for FE
     res.send({
       status: "success",
       message: "Success create new user",
@@ -82,8 +88,10 @@ router.post("/register", async (req, res, next) => {
 // Login
 router.post("/login", async (req, res, next) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
-    // !user && res.status(404).send("user not found");
+    const user = await User.findOne({
+      $or: [{ email: req.body.formLogin }, { username: req.body.formLogin }],
+    });
+    // !user && res.send("user not found");
     if (!user) {
       throw {
         code: 404,
