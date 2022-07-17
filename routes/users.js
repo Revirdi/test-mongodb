@@ -5,6 +5,7 @@ const { protected } = require("../helper/protected");
 const { checkPasswordValidity } = require("../helper");
 const validator = require("email-validator");
 const { verifyToken } = require("../lib/token.js");
+const mongoose = require("mongoose");
 
 // verify user
 router.get("/verification/:token", async (req, res, next) => {
@@ -48,23 +49,19 @@ router.put("/:id", protected, async (req, res, next) => {
         next(error);
       }
     }
-    const checkUser = await User.findOne({
-      $or: [{ email: req.body.email }, { username: req.body.username }],
-      $ie: req.user.userId,
-    });
+
+    const checkUser = await User.find({ _id: { $ne: req.user.userId } });
     if (checkUser) {
       try {
-        if (checkUser.username == req.body.username) {
-          throw {
-            code: 400,
-            message: "Username is already exists",
-          };
-        } else {
-          throw {
-            code: 400,
-            message: "Email is already exists",
-          };
-        }
+        checkUser.map((c) => {
+          if (c.username == req.body.username) {
+            throw {
+              message: "Username is already exists",
+            };
+          }
+          if (c.email == req.body.email)
+            throw { message: "Email is already exists" };
+        });
       } catch (error) {
         next(error);
       }
