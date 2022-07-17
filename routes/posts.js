@@ -92,7 +92,7 @@ router.get("/:id", protected, async (req, res, next) => {
     const post = await Post.find({ _id: req.params.id })
       .populate({
         path: "comments",
-        options: { limit: 1, sort: { createdAt: -1 } },
+        options: { limit: 0, sort: { createdAt: -1 } },
       })
       .populate("postedBy", "_id username profilePicture");
     res.send({

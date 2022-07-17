@@ -26,4 +26,19 @@ router.put("/", protected, async (req, res, next) => {
   }
 });
 
+router.get("/", protected, async (req, res, next) => {
+  try {
+    const comments = await Comment.find({ postId: req.body.postId })
+      .populate("postedBy")
+      .sort({ createdAt: -1 });
+    res.send({
+      status: "Success",
+      message: "Success get a comment",
+      data: comments,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
