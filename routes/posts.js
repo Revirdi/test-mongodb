@@ -85,7 +85,6 @@ router.put("/like", protected, async (req, res, next) => {
     next(error);
   }
 });
-
 // get a post
 router.get("/:id", protected, async (req, res, next) => {
   try {

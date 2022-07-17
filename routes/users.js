@@ -51,7 +51,7 @@ router.put("/:id", protected, async (req, res, next) => {
     }
 
     const checkUser = await User.find({ _id: { $ne: req.user.userId } });
-    if (checkUser) {
+    if (checkUser.length) {
       try {
         checkUser.map((c) => {
           if (c.username == req.body.username) {
