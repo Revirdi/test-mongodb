@@ -65,17 +65,17 @@ router.put("/update/:id", protected, async (req, res, next) => {
   }
 });
 // Like a post
-router.put("/:id", protected, async (req, res, next) => {
+router.put("/:id", async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (!post.likes.includes(req.user.userId)) {
-      await post.updateOne({ $push: { likes: req.user.userId } });
+    if (!post.likes.includes(req.body.userId)) {
+      await post.updateOne({ $push: { likes: req.body.userId } });
       res.send({
         status: "Success",
         message: "The post has been liked",
       });
     } else {
-      await post.updateOne({ $pull: { likes: req.user.userId } });
+      await post.updateOne({ $pull: { likes: req.body.userId } });
       res.send({
         status: "Success",
         message: "The post has been disliked",
