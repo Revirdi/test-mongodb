@@ -23,63 +23,57 @@ router.get("/verification/:token", async (req, res, next) => {
 });
 // update user
 router.put("/:id", protected, async (req, res, next) => {
-  if (req.user.userId === req.params.id) {
-    if (req.body.password) {
-      try {
-        const isPasswordValid = checkPasswordValidity(req.body.password);
-        if (isPasswordValid)
-          throw {
-            code: 400,
-            message: isPasswordValid,
-          };
-        const salt = await bcrypt.genSaltSync(10);
-        req.body.password = await bcrypt.hashSync(req.body.password, salt);
-      } catch (error) {
-        next(error);
-      }
-    }
-    if (req.body.email) {
-      try {
-        if (!validator.validate(req.body.email))
-          throw {
-            code: 400,
-            message: `Please enter a valid email address`,
-          };
-      } catch (error) {
-        next(error);
-      }
-    }
-
-    const checkUser = await User.find({ _id: { $ne: req.user.userId } });
-    if (checkUser.length) {
-      try {
-        checkUser.map((c) => {
-          if (c.username == req.body.username) {
-            throw {
-              message: "Username is already exists",
-            };
-          }
-          if (c.email == req.body.email)
-            throw { message: "Email is already exists" };
-        });
-      } catch (error) {
-        next(error);
-      }
-    }
+  if (req.body.password) {
     try {
-      await User.findByIdAndUpdate(req.user.userId, {
-        $set: req.body,
-      });
-      res.send({
-        status: "success",
-        message: "Success updating user",
+      const isPasswordValid = checkPasswordValidity(req.body.password);
+      if (isPasswordValid)
+        throw {
+          code: 400,
+          message: isPasswordValid,
+        };
+      const salt = await bcrypt.genSaltSync(10);
+      req.body.password = await bcrypt.hashSync(req.body.password, salt);
+    } catch (error) {
+      next(error);
+    }
+  }
+  if (req.body.email) {
+    try {
+      if (!validator.validate(req.body.email))
+        throw {
+          code: 400,
+          message: `Please enter a valid email address`,
+        };
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  const checkUser = await User.find({ _id: { $ne: req.user.userId } });
+  if (checkUser.length) {
+    try {
+      checkUser.map((c) => {
+        if (c.username == req.body.username) {
+          throw {
+            message: "Username is already exists",
+          };
+        }
+        if (c.email == req.body.email)
+          throw { message: "Email is already exists" };
       });
     } catch (error) {
       next(error);
     }
-  } else {
-    const error = new Error("Unauthorized");
-    error.code = 401;
+  }
+  try {
+    await User.findByIdAndUpdate(req.user.userId, {
+      $set: req.body,
+    });
+    res.send({
+      status: "success",
+      message: "Success updating user",
+    });
+  } catch (error) {
     next(error);
   }
 });

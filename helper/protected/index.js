@@ -1,4 +1,5 @@
 const { verifyToken } = require("../../lib/token");
+const User = require("../../models/User");
 
 const protected = async (req, res, next) => {
   try {
