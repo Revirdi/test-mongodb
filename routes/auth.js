@@ -5,6 +5,7 @@ const { isFieldEmpties, checkPasswordValidity } = require("../helper");
 const validator = require("email-validator");
 const { createToken } = require("../lib/token");
 const { sendMail } = require("../lib/nodemailer");
+const { protected } = require("../helper/protected");
 
 // Register
 router.post("/register", async (req, res, next) => {
@@ -131,4 +132,13 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
+router.post("/verify", async (req, res, next) => {
+  const { email, userId } = req.body;
+  const token = createToken({ userId });
+  await sendMail({ email, token });
+  res.send({
+    status: "success",
+    message: "Success sending email",
+  });
+});
 module.exports = router;

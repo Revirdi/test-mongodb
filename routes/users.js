@@ -14,12 +14,21 @@ router.get("/verification/:token", async (req, res, next) => {
 
     const verifiedToken = verifyToken(token);
 
-    const checkUser = await User.findByIdAndUpdate(verifiedToken.userId, {
-      isVerified: true,
-    });
-
+    const checkUser = await User.findByIdAndUpdate(
+      verifiedToken.userId,
+      {
+        isVerified: true,
+      },
+      {
+        new: true,
+      }
+    );
+    console.log(checkUser.isVerified);
+    if (!checkUser.isVerified) throw { message: "Failed to validating user" };
     res.send("<h1>Verification success</h1>");
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
 });
 // update user
 router.put("/:id", protected, async (req, res, next) => {
