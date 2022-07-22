@@ -66,19 +66,29 @@ router.post("/register", async (req, res, next) => {
 
     // save user to mongo
     const user = await newUser.save();
-
-    // create token
     const token = createToken({ userId: user._id });
 
+    const getUser = await User.findByIdAndUpdate(
+      user._id,
+      {
+        userToken: token,
+      },
+      {
+        new: true,
+      }
+    );
+
+    // create token
+
     // create email
-    await sendMail({ email, token });
+    await sendMail({ email, token: getUser.userToken });
 
     // response for FE
     res.send({
       status: "success",
       message: "Success create new user",
       detail: {
-        result: user,
+        result: getUser,
       },
     });
   } catch (error) {
@@ -132,10 +142,18 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
+// resend email
 router.post("/verify", async (req, res, next) => {
   const { email, userId } = req.body;
-  const token = createToken({ userId });
-  await sendMail({ email, token });
+  const token = createToken({ userId, email });
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { userToken: token },
+    {
+      new: true,
+    }
+  );
+  await sendMail({ email, token: user.userToken });
   res.send({
     status: "success",
     message: "Success sending email",

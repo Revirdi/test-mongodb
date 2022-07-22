@@ -1,9 +1,9 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
 const cors = require("cors");
 const bearerToken = require("express-bearer-token");
+require("dotenv").config();
 
 // import Router
 const userRouter = require("./routes/users");
@@ -12,7 +12,7 @@ const postRouter = require("./routes/posts");
 const commentRouter = require("./routes/comments");
 
 // Connecting to mongoDB
-dotenv.config();
+
 mongoose.connect(process.env.MONGO_URL).then(
   () => {
     console.log("Connected to mongoDB");

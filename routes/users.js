@@ -11,6 +11,12 @@ const mongoose = require("mongoose");
 router.get("/verification/:token", async (req, res, next) => {
   try {
     const { token } = req.params;
+    const getUserToken = await User.findOne({ userToken: token });
+
+    if (!getUserToken)
+      return res.send(
+        "<h2>your code has expired, please use the new code</h2>"
+      );
 
     const verifiedToken = verifyToken(token);
 
@@ -23,9 +29,8 @@ router.get("/verification/:token", async (req, res, next) => {
         new: true,
       }
     );
-    console.log(checkUser.isVerified);
     if (!checkUser.isVerified) throw { message: "Failed to validating user" };
-    res.send("<h1>Verification success</h1>");
+    res.send("<h2>Verification success</h2>");
   } catch (error) {
     next(error);
   }

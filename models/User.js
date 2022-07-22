@@ -5,14 +5,11 @@ const UserSchema = new mongoose.Schema(
     username: {
       type: String,
       require: true,
-      min: 3,
-      max: 20,
       unique: true,
     },
     email: {
       type: String,
       require: true,
-      max: 100,
       unique: true,
     },
     bio: {
@@ -27,7 +24,6 @@ const UserSchema = new mongoose.Schema(
     password: {
       type: String,
       require: true,
-      min: 8,
     },
     profilePicture: {
       type: String,
@@ -36,6 +32,9 @@ const UserSchema = new mongoose.Schema(
     isVerified: {
       type: Boolean,
       default: false,
+    },
+    userToken: {
+      type: String,
     },
   },
   { timestamps: true }
