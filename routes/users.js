@@ -36,7 +36,7 @@ router.get("/verification/:token", async (req, res, next) => {
   }
 });
 // update user
-router.put("/:id", protected, async (req, res, next) => {
+router.patch("/", protected, async (req, res, next) => {
   if (req.body.password) {
     try {
       const isPasswordValid = checkPasswordValidity(req.body.password);
@@ -80,9 +80,15 @@ router.put("/:id", protected, async (req, res, next) => {
     }
   }
   try {
-    await User.findByIdAndUpdate(req.user.userId, {
-      $set: req.body,
-    });
+    await User.findByIdAndUpdate(
+      req.user.userId,
+      {
+        $set: req.body,
+      },
+      {
+        new: true,
+      }
+    );
     res.send({
       status: "success",
       message: "Success updating user",

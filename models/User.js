@@ -14,6 +14,7 @@ const UserSchema = new mongoose.Schema(
     },
     bio: {
       type: String,
+      default: null,
     },
     firstName: {
       type: String,

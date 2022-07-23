@@ -66,6 +66,8 @@ router.post("/register", async (req, res, next) => {
 
     // save user to mongo
     const user = await newUser.save();
+
+    // create token
     const token = createToken({ userId: user._id });
 
     const getUser = await User.findByIdAndUpdate(
@@ -78,9 +80,7 @@ router.post("/register", async (req, res, next) => {
       }
     );
 
-    // create token
-
-    // create email
+    // Sending to email
     await sendMail({ email, token: getUser.userToken });
 
     // response for FE
