@@ -90,6 +90,7 @@ router.patch("/", protected, async (req, res, next) => {
         new: true,
       }
     );
+
     res.send({
       status: "success",
       message: "Success updating user",
@@ -112,7 +113,6 @@ router.get("/profile", protected, async (req, res, next) => {
     next(error);
   }
 });
-
 // update user avatar
 router.patch(
   "/avatar",
@@ -122,7 +122,7 @@ router.patch(
     try {
       const { filename } = req.file;
       const finalFileName = `/public/avatar/${filename}`;
-      await User.findByIdAndUpdate(
+      const lohe = await User.findByIdAndUpdate(
         req.user.userId,
         {
           profilePicture: finalFileName,
@@ -131,9 +131,12 @@ router.patch(
           new: true,
         }
       );
+      const { password, updatedAt, ...other } = lohe._doc;
+
       res.send({
         status: "success",
         message: "Success updating avatar",
+        result: other,
       });
     } catch (error) {
       next(error);

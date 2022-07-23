@@ -18,9 +18,11 @@ const UserSchema = new mongoose.Schema(
     },
     firstName: {
       type: String,
+      default: "",
     },
     lastName: {
       type: String,
+      default: "",
     },
     password: {
       type: String,
