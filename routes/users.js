@@ -6,6 +6,7 @@ const { checkPasswordValidity } = require("../helper");
 const validator = require("email-validator");
 const { verifyToken } = require("../lib/token.js");
 const mongoose = require("mongoose");
+const { uploadAvatar } = require("../lib/multer");
 
 // verify user
 router.get("/verification/:token", async (req, res, next) => {
@@ -111,5 +112,33 @@ router.get("/profile", protected, async (req, res, next) => {
     next(error);
   }
 });
+
+// update user avatar
+router.patch(
+  "/avatar",
+  protected,
+  uploadAvatar.single("avatar"),
+  async (req, res, next) => {
+    try {
+      const { filename } = req.file;
+      const finalFileName = `/public/avatar/${filename}`;
+      await User.findByIdAndUpdate(
+        req.user.userId,
+        {
+          profilePicture: finalFileName,
+        },
+        {
+          new: true,
+        }
+      );
+      res.send({
+        status: "success",
+        message: "Success updating avatar",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 module.exports = router;
