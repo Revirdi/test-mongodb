@@ -3,6 +3,7 @@ const Post = require("../models/Post");
 const Comment = require("../models/Comment");
 const { protected } = require("../helper/protected");
 const User = require("../models/User");
+const { uploadPost } = require("../lib/multer");
 // Create a post
 router.post("/", protected, async (req, res, next) => {
   const { desc, postImage } = req.body;
@@ -151,5 +152,22 @@ router.get("/timeline/profile", protected, async (req, res, next) => {
     });
   } catch (error) {}
 });
+
+// upload post image
+router.post(
+  "/upload",
+  protected,
+  uploadPost.single("postImage"),
+  (req, res) => {
+    try {
+      return res.send({
+        status: "Success",
+        message: "Success upload post image",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
 
 module.exports = router;
