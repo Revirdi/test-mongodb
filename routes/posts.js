@@ -108,9 +108,17 @@ router.get("/:id", protected, async (req, res, next) => {
 // get all post
 router.get("/timeline/all", async (req, res, next) => {
   try {
+    let { page, pageSize } = req.query;
+    page = +page;
+    pageSize = +pageSize;
+    const limit = pageSize;
+    const offset = (page - 1) * pageSize;
     const post = await Post.find()
       .populate("postedBy", "_id username profilePicture")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(offset);
+    if (!post.length) throw { message: "Post not found" };
     res.send({
       status: "Success",
       message: "Success get a post",
