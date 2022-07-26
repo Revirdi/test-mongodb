@@ -28,8 +28,9 @@ router.post("/", protected, async (req, res, next) => {
 router.delete("/:id", protected, async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id);
+    if (!post) throw { message: "Cannot find a post" };
     if (post.postedBy.toString() === req.user.userId) {
-      await post.deleteOne({ $set: req.body });
+      await post.deleteOne({ _id: req.params.id });
       res.send({
         status: "Success",
         message: "Succes delete a post",
@@ -45,12 +46,12 @@ router.delete("/:id", protected, async (req, res, next) => {
   }
 });
 // Update a post
-router.put("/update/:id", protected, async (req, res, next) => {
+router.patch("/update/:id", protected, async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id);
-    // const string = post.postedBy.toString();
     if (post.postedBy.toString() === req.user.userId) {
-      await post.updateOne({ $set: req.body });
+      const data = await post.updateOne({ $set: req.body });
+      if (!data.modifiedCount) throw { message: "Failed to update" };
       res.send({
         status: "Success",
         message: "Succes update a post",
