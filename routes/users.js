@@ -100,9 +100,9 @@ router.patch("/", protected, async (req, res, next) => {
   }
 });
 // get a user
-router.get("/profile", protected, async (req, res, next) => {
+router.get("/profile/:userId", async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.userId);
+    const user = await User.findById(req.params.userId);
     const { password, updatedAt, ...other } = user._doc;
     res.send({
       status: "Success",
