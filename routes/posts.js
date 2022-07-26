@@ -66,7 +66,7 @@ router.put("/update/:id", protected, async (req, res, next) => {
   }
 });
 // Like a post
-router.put("/:id", async (req, res, next) => {
+router.put("/:id", protected, async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post.likes.includes(req.body.userId)) {
