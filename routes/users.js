@@ -38,32 +38,6 @@ router.get("/verification/:token", async (req, res, next) => {
 });
 // update user
 router.patch("/", protected, async (req, res, next) => {
-  if (req.body.password) {
-    try {
-      const isPasswordValid = checkPasswordValidity(req.body.password);
-      if (isPasswordValid)
-        throw {
-          code: 400,
-          message: isPasswordValid,
-        };
-      const salt = await bcrypt.genSaltSync(10);
-      req.body.password = await bcrypt.hashSync(req.body.password, salt);
-    } catch (error) {
-      next(error);
-    }
-  }
-  if (req.body.email) {
-    try {
-      if (!validator.validate(req.body.email))
-        throw {
-          code: 400,
-          message: `Please enter a valid email address`,
-        };
-    } catch (error) {
-      next(error);
-    }
-  }
-
   const checkUser = await User.find({ _id: { $ne: req.user.userId } });
   if (checkUser.length) {
     try {
