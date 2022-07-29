@@ -5,7 +5,7 @@ const { protected } = require("../helper/protected");
 const User = require("../models/User");
 
 // add a comment
-router.put("/", protected, async (req, res, next) => {
+router.post("/", protected, async (req, res, next) => {
   try {
     const { text, postId } = req.body;
     const newComment = new Comment({
@@ -28,15 +28,18 @@ router.put("/", protected, async (req, res, next) => {
 });
 
 // get a comment
-router.get("/", protected, async (req, res, next) => {
+router.get("/:id", protected, async (req, res, next) => {
   try {
-    const comments = await Comment.find({ postId: req.body.postId })
-      .populate("postedBy")
-      .sort({ createdAt: -1 });
+    const commentLength = await Comment.find({ postId: req.params.id });
+    const comments = await Comment.find({ postId: req.params.id })
+      .populate("postedBy", "_id username profilePicture")
+      .sort({ createdAt: -1 })
+      .limit(2);
     res.send({
       status: "Success",
       message: "Success get a comment",
       data: comments,
+      length: commentLength.length,
     });
   } catch (error) {
     next(error);

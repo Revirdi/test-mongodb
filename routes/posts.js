@@ -109,10 +109,11 @@ router.get("/:id", protected, async (req, res, next) => {
 router.get("/timeline/all", async (req, res, next) => {
   try {
     let { page, pageSize } = req.query;
-    page = +page;
-    pageSize = +pageSize;
+    // page = +page;
+    // pageSize = +pageSize;
     const limit = pageSize;
     const offset = (page - 1) * pageSize;
+    const post2 = await Post.find();
     const post = await Post.find()
       .populate("postedBy", "_id username profilePicture")
       .sort({ createdAt: -1 })
@@ -123,6 +124,7 @@ router.get("/timeline/all", async (req, res, next) => {
       status: "Success",
       message: "Success get a post",
       data: post,
+      length: post2.length,
     });
   } catch (error) {
     next(error);
