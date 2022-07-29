@@ -30,11 +30,15 @@ router.post("/", protected, async (req, res, next) => {
 // get a comment
 router.get("/:id", protected, async (req, res, next) => {
   try {
+    let { page, pageSize } = req.query;
+    const limit = pageSize;
+    const offset = (page - 1) * pageSize;
     const commentLength = await Comment.find({ postId: req.params.id });
     const comments = await Comment.find({ postId: req.params.id })
       .populate("postedBy", "_id username profilePicture")
       .sort({ createdAt: -1 })
-      .limit(2);
+      .limit(limit)
+      .skip(offset);
     res.send({
       status: "Success",
       message: "Success get a comment",
