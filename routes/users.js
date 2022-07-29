@@ -54,6 +54,7 @@ router.patch("/", protected, async (req, res, next) => {
       next(error);
     }
   }
+
   try {
     await User.findByIdAndUpdate(
       req.user.userId,
@@ -64,7 +65,6 @@ router.patch("/", protected, async (req, res, next) => {
         new: true,
       }
     );
-
     res.send({
       status: "success",
       message: "Success updating user",
