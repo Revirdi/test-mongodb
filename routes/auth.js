@@ -10,9 +10,9 @@ const { protected } = require("../helper/protected");
 // Register
 router.post("/register", async (req, res, next) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, confirm } = req.body;
 
-    const emptyFields = isFieldEmpties({ username, email, password });
+    const emptyFields = isFieldEmpties({ username, email, password, confirm });
 
     // checking empties fields
     if (emptyFields.length) {
@@ -28,6 +28,10 @@ router.post("/register", async (req, res, next) => {
         code: 400,
         message: `Please enter a valid email address`,
       };
+
+    // Comfirm password
+    if (password !== confirm)
+      throw { code: 400, message: "Password did not match" };
 
     // checking password validity
     const isPasswordValid = checkPasswordValidity(password);
