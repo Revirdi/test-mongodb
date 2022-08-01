@@ -93,7 +93,6 @@ router.get("/:id", protected, async (req, res, next) => {
     const post = await Post.find({ _id: req.params.id })
       .populate({
         path: "comments",
-        options: { limit: 0, sort: { createdAt: -1 } },
       })
       .populate("postedBy", "_id username profilePicture");
     res.send({
@@ -135,9 +134,6 @@ router.get("/timeline/liked", protected, async (req, res, next) => {
     const limit = pageSize;
     const offset = (page - 1) * pageSize;
     const post = await Post.find({ likes: { $in: req.user.userId } })
-      .sort({
-        createdAt: -1,
-      })
       .limit(limit)
       .skip(offset)
       .populate("postedBy", "_id username profilePicture");

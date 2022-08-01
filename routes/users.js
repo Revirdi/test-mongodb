@@ -42,13 +42,8 @@ router.patch("/", protected, async (req, res, next) => {
   if (checkUser.length) {
     try {
       checkUser.map((c) => {
-        if (c.username == req.body.username) {
-          throw {
-            message: "Username is already exists",
-          };
-        }
-        if (c.email == req.body.email)
-          throw { message: "Email is already exists" };
+        if (c.username == req.body.username)
+          throw { message: "Username is already exists" };
       });
     } catch (error) {
       next(error);

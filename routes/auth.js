@@ -102,7 +102,6 @@ router.post("/login", async (req, res, next) => {
     const user = await User.findOne({
       $or: [{ email: req.body.formLogin }, { username: req.body.formLogin }],
     });
-    // !user && res.send("user not found");
     if (!user) {
       throw {
         code: 404,
