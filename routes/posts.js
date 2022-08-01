@@ -1,9 +1,9 @@
 const router = require("express").Router();
 const Post = require("../models/Post");
-const Comment = require("../models/Comment");
 const { protected } = require("../helper/protected");
-const User = require("../models/User");
 const { uploadPost } = require("../lib/multer");
+const Comment = require("../models/Comment");
+
 // Create a post
 router.post("/", protected, async (req, res, next) => {
   const { desc, postImage } = req.body;
@@ -28,9 +28,11 @@ router.post("/", protected, async (req, res, next) => {
 router.delete("/:id", protected, async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id);
+    const comment = await Comment.find({ postId: req.params.id });
     if (!post) throw { message: "Cannot find a post" };
     if (post.postedBy.toString() === req.user.userId) {
       await post.deleteOne({ _id: req.params.id });
+      if (comment.length) await Comment.deleteMany({ postId: req.params.id });
       res.send({
         status: "Success",
         message: "Succes delete a post",

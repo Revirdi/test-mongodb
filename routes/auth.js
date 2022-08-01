@@ -10,9 +10,14 @@ const { protected } = require("../helper/protected");
 // Register
 router.post("/register", async (req, res, next) => {
   try {
-    const { username, email, password, confirm } = req.body;
+    const { username, email, password, confirm_password } = req.body;
 
-    const emptyFields = isFieldEmpties({ username, email, password, confirm });
+    const emptyFields = isFieldEmpties({
+      username,
+      email,
+      password,
+      confirm_password,
+    });
 
     // checking empties fields
     if (emptyFields.length) {
@@ -22,27 +27,9 @@ router.post("/register", async (req, res, next) => {
         data: { result: emptyFields },
       };
     }
-    // checking email validity
-    if (!validator.validate(email))
-      throw {
-        code: 400,
-        message: `Please enter a valid email address`,
-      };
-
-    // Comfirm password
-    if (password !== confirm)
-      throw { code: 400, message: "Password did not match" };
-
-    // checking password validity
-    const isPasswordValid = checkPasswordValidity(password);
-    if (isPasswordValid)
-      throw {
-        code: 400,
-        message: isPasswordValid,
-      };
 
     // checking if username or email is already exist
-    const checkUser = await User.findOne({ email });
+    const checkUser = await User.findOne({ $or: [{ email }, { username }] });
     if (checkUser) {
       if (checkUser.username == username) {
         throw {
@@ -56,6 +43,24 @@ router.post("/register", async (req, res, next) => {
         };
       }
     }
+    // checking email validity
+    if (!validator.validate(email))
+      throw {
+        code: 400,
+        message: `Please enter a valid email address`,
+      };
+
+    // Comfirm password
+    if (password !== confirm_password)
+      throw { code: 400, message: "Password did not match" };
+
+    // checking password validity
+    const isPasswordValid = checkPasswordValidity(password);
+    if (isPasswordValid)
+      throw {
+        code: 400,
+        message: isPasswordValid,
+      };
 
     // hashing password
     const salt = await bcrypt.genSaltSync(10);
