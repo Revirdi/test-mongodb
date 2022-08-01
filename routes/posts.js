@@ -109,8 +109,6 @@ router.get("/:id", protected, async (req, res, next) => {
 router.get("/timeline/all", async (req, res, next) => {
   try {
     let { page, pageSize } = req.query;
-    // page = +page;
-    // pageSize = +pageSize;
     const limit = pageSize;
     const offset = (page - 1) * pageSize;
     const post2 = await Post.find();
@@ -133,33 +131,49 @@ router.get("/timeline/all", async (req, res, next) => {
 // get liked post
 router.get("/timeline/liked", protected, async (req, res, next) => {
   try {
+    let { page, pageSize } = req.query;
+    const limit = pageSize;
+    const offset = (page - 1) * pageSize;
     const post = await Post.find({ likes: { $in: req.user.userId } })
       .sort({
         createdAt: -1,
       })
+      .limit(limit)
+      .skip(offset)
       .populate("postedBy", "_id username profilePicture");
+    const post2 = await Post.find({ likes: { $in: req.user.userId } });
+    if (!post.length) throw { message: "Post not found" };
 
     res.send({
       status: "Success",
       message: "Success get a post",
       data: post,
+      length: post2.length,
     });
   } catch (error) {
     next(error);
   }
 });
 // get my post
-router.get("/timeline/profile", protected, async (req, res, next) => {
+router.get("/timeline/mypost", protected, async (req, res, next) => {
   try {
+    let { page, pageSize } = req.query;
+    const limit = pageSize;
+    const offset = (page - 1) * pageSize;
     const post = await Post.find({ postedBy: req.user.userId })
       .sort({
         createdAt: -1,
       })
+      .limit(limit)
+      .skip(offset)
       .populate("postedBy", "_id username profilePicture");
+    const post2 = await Post.find({ postedBy: req.user.userId });
+    if (!post.length) throw { message: "Post not found" };
     res.send({
       status: "Success",
       message: "Success get a post",
       data: post,
+      length: post2.length,
     });
   } catch (error) {}
 });
