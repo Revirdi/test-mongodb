@@ -31,7 +31,7 @@ router.get("/verification/:token", async (req, res, next) => {
       }
     );
     if (!checkUser.isVerified) throw { message: "Failed to validating user" };
-    res.send("<h2>Verification success</h2>");
+    res.redirect("http://localhost:3000/home");
   } catch (error) {
     next(error);
   }
