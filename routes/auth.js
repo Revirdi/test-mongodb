@@ -124,7 +124,7 @@ router.post("/login", async (req, res, next) => {
     );
 
     if (!comparePassword) {
-      const error = new Error("Password is incorect");
+      const error = new Error("Email / Password is incorect");
       error.code = 400;
       throw error;
     }

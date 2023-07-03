@@ -118,7 +118,6 @@ router.get("/timeline/all", async (req, res, next) => {
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip(offset);
-    if (!post.length) throw { message: "Post not found" };
     res.send({
       status: "Success",
       message: "Success get a post",
